@@ -6,7 +6,12 @@ RUN set -eux \
 		  gcc \
 		  libffi-dev \
 		  musl-dev \
-		  openssl-dev
+		  openssl-dev \bash \
+      curl \
+      tar \
+      openssh-client \
+      sshpass \
+      git
 
 RUN pip install --no-cache-dir --no-compile ansible
 
