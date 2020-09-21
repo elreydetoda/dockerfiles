@@ -11,7 +11,8 @@ RUN set -eux \
       tar \
       openssh-client \
       sshpass \
-      git
+      git \
+      rsync
 
 RUN pip install --no-cache-dir --no-compile ansible
 
