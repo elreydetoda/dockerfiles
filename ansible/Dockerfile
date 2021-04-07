@@ -1,8 +1,8 @@
-FROM python:3-alpine
+FROM python:3
 LABEL maintainer="Alex (elrey741) <dockerfile-social-contact@elrey741.33mail.com>"
 
 RUN set -eux \
-	  && apk --update --no-cache add --virtual build-dependencies  \
+	  && apt update \
 		  gcc \
 		  libffi-dev \
 		  musl-dev \
