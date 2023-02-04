@@ -13,7 +13,6 @@ function vmware_prep(){
   echo "Setting up VMWare"
   /usr/bin/vmware-modconfig --console --install-all
   /etc/init.d/vmware start
-  /etc/init.d/vmware-workstation-server start
   /etc/init.d/vmware-USBArbitrator start
 }
 
@@ -21,8 +20,11 @@ function main(){
   VMWARE_SN="${VMWARE_LIC_KEY:-}"
 
   if [[ -n "${VMWARE_SN}" ]] ; then
-    ubuntu_prep
-    vmware_prep
+    apt list --installed 2>/dev/null | grep -q linux-headers || ubuntu_prep
+    ( 
+      [[ -x "/usr/bin/vmware" ]] &&
+      lsmod | grep -E '(vmmon|vmnet)' >/dev/null
+    ) || vmware_prep
     /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
     packer "${@}"
   else
