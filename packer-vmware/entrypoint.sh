@@ -24,7 +24,8 @@ function main(){
     apt list --installed 2>/dev/null | grep -q linux-headers || ubuntu_prep
     ( 
       [[ -x "/usr/bin/vmware" ]] &&
-      lsmod | grep -E '(vmmon|vmnet)' >/dev/null
+      lsmod | grep -q 'vmmon' && 
+      lsmod | grep -q 'vmnet'
     ) || vmware_prep
     /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
     [[ -n "${PREP_ONLY}" ]] || packer "${@}"
