@@ -18,6 +18,7 @@ function vmware_prep(){
 
 function main(){
   VMWARE_SN="${VMWARE_LIC_KEY:-}"
+  PREP_ONLY="${PREP_ONLY:-}"
 
   if [[ -n "${VMWARE_SN}" ]] ; then
     apt list --installed 2>/dev/null | grep -q linux-headers || ubuntu_prep
@@ -26,7 +27,7 @@ function main(){
       lsmod | grep -E '(vmmon|vmnet)' >/dev/null
     ) || vmware_prep
     /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
-    packer "${@}"
+    [[ -n "${PREP_ONLY}" ]] || packer "${@}"
   else
     echo "Please set your VMWare licence as an environment variable of VMWARE_LIC_KEY"
     echo " (i.e. VMWARE_LIC_KEY='xxxxx-xxxxx-xxxxx-xxxxx-xxxxx')"
