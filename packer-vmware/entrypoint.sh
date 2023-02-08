@@ -28,6 +28,7 @@ function main(){
       lsmod | grep -q 'vmnet'
     ) || vmware_prep
     /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
+    /usr/bin/vmware-networks --start
     [[ -n "${PREP_ONLY}" ]] || packer "${@}"
   else
     echo "Please set your VMWare licence as an environment variable of VMWARE_LIC_KEY"
