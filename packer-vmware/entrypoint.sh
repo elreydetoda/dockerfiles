@@ -29,7 +29,7 @@ function main(){
     ) || vmware_prep
     /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
     /usr/bin/vmware-networks --start
-    [[ -n "${PREP_ONLY}" ]] || packer "${@}"
+    [[ -n "${PREP_ONLY}" ]] || ( packer init "${BUILD_FOLDER}" && packer "${@}" "${BUILD_FOLDER}" )
   else
     echo "Please set your VMWare licence as an environment variable of VMWARE_LIC_KEY"
     echo " (i.e. VMWARE_LIC_KEY='xxxxx-xxxxx-xxxxx-xxxxx-xxxxx')"
