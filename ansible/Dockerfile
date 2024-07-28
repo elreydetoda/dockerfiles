@@ -1,4 +1,4 @@
-FROM python:3-slim
+FROM docker.io/python:3-slim
 LABEL maintainer="Alex (elrey741) <dockerfile-social-contact@elrey741.mozmail.com>"
 
 RUN set -eux \
