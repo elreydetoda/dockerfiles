@@ -5,7 +5,7 @@ on:
     branches:
       - main
   workflow_dispatch:
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,15 +30,15 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./ansible
-          file: ./Dockerfile
-          platforms: linux/amd64
+          file: ./ansible/Dockerfile
+          # platforms: linux/amd64
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/ansible:latest
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./ansible-playbook
-          file: ./Dockerfile
-          platforms: linux/amd64
+          file: ./ansible-playbook/Dockerfile
+          # platforms: linux/amd64
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/ansible-playbook:latest
