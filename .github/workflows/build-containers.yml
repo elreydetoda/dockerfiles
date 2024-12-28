@@ -42,3 +42,11 @@ jobs:
           # platforms: linux/amd64
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/ansible-playbook:latest
+      - name: Build and push ansible
+        uses: docker/build-push-action@v2
+        with:
+          context: ./packer-vmware
+          file: ./packer-vmware/Dockerfile
+          # platforms: linux/amd64
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/packer-vmware:latest
