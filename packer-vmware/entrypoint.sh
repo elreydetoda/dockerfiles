@@ -13,28 +13,21 @@ function vmware_prep(){
   echo "Setting up VMWare"
   /usr/bin/vmware-modconfig --console --install-all
   /etc/init.d/vmware start
-  /etc/init.d/vmware-USBArbitrator start
 }
 
 function main(){
   VMWARE_SN="${VMWARE_LIC_KEY:-}"
   PREP_ONLY="${PREP_ONLY:-}"
 
-  if [[ -n "${VMWARE_SN}" ]] ; then
-    apt list --installed 2>/dev/null | grep -q linux-headers || ubuntu_prep
-    ( 
-      [[ -x "/usr/bin/vmware" ]] &&
-      lsmod | grep -q 'vmmon' && 
-      lsmod | grep -q 'vmnet'
-    ) || vmware_prep
-    /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
-    /usr/bin/vmware-networks --start
-    [[ -n "${PREP_ONLY}" ]] || ( packer init "${BUILD_FOLDER}" && packer "${@}" "${BUILD_FOLDER}" )
-  else
-    echo "Please set your VMWare licence as an environment variable of VMWARE_LIC_KEY"
-    echo " (i.e. VMWARE_LIC_KEY='xxxxx-xxxxx-xxxxx-xxxxx-xxxxx')"
-    exit 1
-  fi
+  apt list --installed 2>/dev/null | grep -q linux-headers || ubuntu_prep
+  (
+    [[ -x "/usr/bin/vmware" ]] &&
+    lsmod | grep -q 'vmmon' &&
+    lsmod | grep -q 'vmnet'
+  ) || vmware_prep
+  [[ -n "${VMWARE_SN}" ]] && /usr/lib/vmware/bin/vmware-vmx --new-sn "${VMWARE_SN}"
+  /usr/bin/vmware-networks --start
+  [[ -n "${PREP_ONLY}" ]] || ( packer init "${BUILD_FOLDER}" && packer "${@}" "${BUILD_FOLDER}" )
 }
 
 # https://elrey.casa/bash/scripting/main
