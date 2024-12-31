@@ -1,4 +1,4 @@
-ARG PACKER_VERSION=1.8.5
+ARG PACKER_VERSION=1.11.2
 FROM "docker.io/hashicorp/packer:light-${PACKER_VERSION}" as packer_bin
 FROM docker.io/ubuntu:24.04
 SHELL ["/bin/bash", "-euxc"]
