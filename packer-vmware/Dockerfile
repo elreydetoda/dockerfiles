@@ -17,12 +17,13 @@ RUN set -o pipefail \
         build-essential \
         net-tools \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-ARG VMWARE_WORKSTATION_VERSION=16.2.5
-ARG VMWARE_WORKSTATION_BUILD_NUMBER=20904516
+ARG VMWARE_WORKSTATION_VERSION=17.6.2
+ARG VMWARE_WORKSTATION_BUILD_NUMBER=24409262
+# found link here: https://community.broadcom.com/vmware-cloud-foundation/question/using-vmware-workstation-1752-on-ubuntu-in-cicd-pipelines-fails
 RUN set -o pipefail \
     && apt-get update \
-    && curl -H 'user-agent: mozilla' -fsSL https://web.archive.org/web/20221024070556/https://download3.vmware.com/software/WKST-1624-LX/VMware-Workstation-Full-16.2.4-20089737.x86_64.bundle -o /tmp/VMWareWorkstation.bundle \
-    && /bin/bash -x /tmp/VMWareWorkstation.bundle --console --required --eulas-agreed \
+    && curl -H 'user-agent: mozilla' -fsSL "https://softwareupdate.vmware.com/cds/vmw-desktop/ws/${VMWARE_WORKSTATION_VERSION}/${VMWARE_WORKSTATION_BUILD_NUMBER}/linux/core/VMware-Workstation-${VMWARE_WORKSTATION_VERSION}-${VMWARE_WORKSTATION_BUILD_NUMBER}.x86_64.bundle.tar" -o /tmp/VMWareWorkstation.bundle.tar && tar -C /tmp/ -xvf /tmp/VMWareWorkstation.bundle.tar \
+    && /bin/bash -x "/tmp/VMware-Workstation-${VMWARE_WORKSTATION_VERSION}-${VMWARE_WORKSTATION_BUILD_NUMBER}.x86_64.bundle" --console --required --eulas-agreed \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
