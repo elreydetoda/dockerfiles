@@ -12,82 +12,75 @@ jobs:
     strategy:
       matrix:
         container:
-          - name: ansible
-            context: ./ansible
-            dockerfile: ./ansible/Dockerfile
-            tag: ansible:latest
-          - name: ansible-playbook
-            context: ./ansible-playbook
-            dockerfile: ./ansible-playbook/Dockerfile
-            tag: ansible-playbook:latest
-          - name: packer-vmware
-            context: ./packer-vmware
-            dockerfile: ./packer-vmware/Dockerfile
-            tag: packer-vmware:latest
+          - ./ansible|./ansible/Dockerfile|ansible:latest
+          - ./ansible-playbook|./ansible-playbook/Dockerfile|ansible-playbook:latest
+          - ./packer-vmware|./packer-vmware/Dockerfile|packer-vmware:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
+      # Add support for more platforms with QEMU (optional)
+      # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push ${{ matrix.container.name }}
-        uses: docker/build-push-action@v2
+      - name: Prep variables for build and push
+        shell: bash
+        run: |
+          set -exuo pipefail
+          (
+            echo CONTEXT="$(cut -d '|' -f 1 <<< "${{ matrix.container }}")"
+            echo DOCKERFILE="$(cut -d '|' -f 2 <<< "${{ matrix.container }}")"
+            echo DOCKER_TAG="$(cut -d '|' -f 3 <<< "${{ matrix.container }}")"
+          ) >> $GITHUB_ENV
+
+      - name: Build and push ${{ matrix.container }}
+        uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.container.context }}
-          file: ${{ matrix.container.dockerfile }}
+          context: ${{ env.CONTEXT }}
+          file: ${{ env.DOCKERFILE }}
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.container.tag }}
+          tags: ghcr.io/${{ github.repository_owner }}/${{ env.DOCKER_TAG }}
 
   build-packer-vmware:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        container:
-          - name: packer-vmware
-            context: ./packer-vmware
-            dockerfile: ./packer-vmware/Dockerfile
-            image_name: packer-vmware
-        build_args:
-          - name: UBUNTU_VERSION
-            version: 20.04
-          - name: UBUNTU_VERSION
-            version: 22.04
-          - name: UBUNTU_VERSION
-            version: 24.04
-
+        ubuntu_version: [20.04, 22.04, 24.04]
+    steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
+      # Add support for more platforms with QEMU (optional)
+      # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push ${{ matrix.container.name }}
-        uses: docker/build-push-action@v2
+      - name: Build and push packer-vmware with UBUNTU_VERSION=${{ matrix.ubuntu_version }}
+        uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.container.context }}
-          file: ${{ matrix.container.dockerfile }}
+          context: ./packer-vmware
+          file: ./packer-vmware/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.container.image_name }}:${{ matrix.build_args.version }}
-          build-args:
-            - ${{ matrix.build_args.name }}=${{ matrix.build_args.version }}
+          tags: ghcr.io/${{ github.repository_owner }}/packer-vmware:${{ matrix.ubuntu_version }}
+          build-args: UBUNTU_VERSION=${{ matrix.ubuntu_version }}

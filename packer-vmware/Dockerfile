@@ -20,6 +20,7 @@ RUN set -o pipefail \
         libxcb-shm0 \
         libxcb-render0 \
         libxcb-xinerama0 \
+        libxml2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # last 3 packages were added for 17.6.2
 ARG VMWARE_WORKSTATION_VERSION=17.6.2
