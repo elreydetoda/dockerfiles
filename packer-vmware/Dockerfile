@@ -1,6 +1,7 @@
 ARG PACKER_VERSION=1.11.2
+ARG UBUNTU_VERSION=24.04
 FROM "docker.io/hashicorp/packer:light-${PACKER_VERSION}" as packer_bin
-FROM docker.io/ubuntu:24.04
+FROM docker.io/ubuntu:${UBUNTU_VERSION}
 SHELL ["/bin/bash", "-euxc"]
 COPY --from=packer_bin /bin/packer /usr/local/bin/packer
 RUN set -o pipefail \
